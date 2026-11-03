@@ -6,7 +6,7 @@
 
 #include "resource.h"
 
-static BOOL CALLBACK AboutDlgProc(
+static INT_PTR CALLBACK AboutDlgProc(
    HWND hWnd,
    UINT uMsg,
    WPARAM wParam,

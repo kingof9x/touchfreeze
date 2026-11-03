@@ -1,0 +1,10 @@
+# Build output
+Executable/
+Intermediate/
+dist/
+
+# Visual Studio
+.vs/
+*.user
+*.aps
+*.VC.db
