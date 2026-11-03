@@ -23,10 +23,6 @@ static INT_PTR CALLBACK AboutDlgProc(
         case IDOK:
             EndDialog(hWnd, IDOK);
             break;
-        case IDC_DONATE_AMAZON:
-            ContactOrDonate(hWnd, 1);
-            break;
-        
         case IDC_EMAIL:
             ContactOrDonate(hWnd, 2);
             break;

@@ -17,7 +17,6 @@ DWORD               g_FreezeTicks   = 700;
 #pragma data_seg()
 
 HANDLE              g_hMutex = NULL;
-UINT                g_nNotifyMessage = ::RegisterWindowMessage(TFHookNotifyMsg);
 
 #pragma comment(linker,"/SECTION:shareddata,SRW")
 
@@ -44,11 +43,6 @@ BOOL APIENTRY DllMain( HANDLE hModule,
             break;
     }
     return TRUE;
-}
-
-void SendNotify(NotifyType notifyType, LPARAM data)
-{
-    ::PostMessage(HWND_BROADCAST, g_nNotifyMessage, (WPARAM) notifyType, data);
 }
 
 static void LockGlobals()
@@ -116,13 +110,9 @@ __declspec(dllexport) LRESULT CALLBACK MouseHookProc( int code,
 {
     MSLLHOOKSTRUCT  * pMouseHS = (MSLLHOOKSTRUCT *) lParam;
     
-    if ((GetTickCount() - g_LastKeyTime) < g_FreezeTicks && IsBlockMouseMessage(wParam))
+    if ((GetTickCount() - g_LastKeyTime) < g_FreezeTicks && IsBlockMouseMessage((UINT) wParam))
     {
-        g_FreezeCount++;     
-        
-        if (g_hWnd)
-            PostMessage(g_hWnd, g_nNotifyMessage, TFNT_Blocked, 0);
-        
+        g_FreezeCount++;
         return 1;
     }
 
