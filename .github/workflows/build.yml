@@ -30,9 +30,27 @@ jobs:
           path: dist/*.exe
           if-no-files-found: error
 
+      - name: Check whether this version is already released
+        id: ver
+        if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        run: |
+          $rc = Get-Content Sources/TestApp/KeyHookTest.rc -Raw
+          $null = $rc -match '"ProductVersion",\s*"(\d+\.\d+\.\d+)'
+          $tag = "v$($Matches[1])"
+          git fetch --tags --quiet
+          $exists = [bool](git tag --list $tag)
+          "tag=$tag" >> $env:GITHUB_OUTPUT
+          "release=$((-not $exists) -or ('${{ github.ref }}' -eq "refs/tags/$tag"))".ToLower() >> $env:GITHUB_OUTPUT
+
+      # Pushing to master with a new ProductVersion in KeyHookTest.rc
+      # creates the tag and publishes a release with the installer.
       - name: Publish release
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: steps.ver.outputs.release == 'true'
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.ver.outputs.tag }}
+          name: TouchFreeze ${{ steps.ver.outputs.tag }}
+          target_commitish: ${{ github.sha }}
           files: dist/*.exe
           generate_release_notes: true
